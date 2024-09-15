@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAQ</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin: 20px 0;
+      font-size: 2rem;
+      color: #333;
+    }
+    .faq-container {
+      width: 80%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .faq {
+      padding: 15px;
+      border-bottom: 1px solid #ddd;
+    }
+    .faq:last-child {
+      border-bottom: none;
+    }
+    .faq h3 {
+      font-size: 1.2rem;
+      color: #007bff;
+    }
+    .faq p {
+      margin: 5px 0;
+      font-size: 1rem;
+      color: #555;
+    }
+    #faq-form {
+      width: 80%;
+      max-width: 900px;
+      margin: 20px auto 0;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    #faq-form input[type="text"] {
+      padding: 12px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #faq-form button {
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+    #faq-form button:hover {
+      background-color: #0056b3;
+    }
+    .faq button {
+      padding: 8px 12px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+    .faq button:hover {
+      background-color: #c82333;
+    }
+    @media (max-width: 768px) {
+      .faq-container, #faq-form {
+        width: 90%;
+      }
+      h1 {
+        font-size: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>FAQ</h1>
+  <form id="faq-form">
+    <input type="text" id="question" placeholder="Enter question" required>
+    <input type="text" id="answer" placeholder="Enter answer" required>
+    <button type="submit">Add FAQ</button>
+  </form>
+  <div class="faq-container" id="faq-container"></div>
+
+  <script>
+    const faqContainer = document.getElementById('faq-container');
+    const faqForm = document.getElementById('faq-form');
+
+    // Fetch FAQs
+    const fetchFAQs = async () => {
+      const res = await fetch('/api/faqs');
+      const data = await res.json();
+      renderFAQs(data);
+    };
+
+    // Render FAQs
+    const renderFAQs = (faqs) => {
+      faqContainer.innerHTML = '';
+      faqs.forEach(faq => {
+        faqContainer.innerHTML += `
+          <div class="faq">
+            <h3>${faq.question}</h3>
+            <p>${faq.answer}</p>
+            <button onclick="deleteFAQ('${faq._id}')">Delete</button>
+            <button onclick="editFAQ('${faq._id}', '${faq.question}', '${faq.answer}')">Edit</button>
+          </div>
+        `;
+      });
+    };
+
+    // Add a new FAQ
+    faqForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const question = document.getElementById('question').value;
+      const answer = document.getElementById('answer').value;
+      
+      await fetch('/api/faqs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, answer })
+      });
+      
+      fetchFAQs();
+      faqForm.reset();
+    });
+
+    // Delete FAQ
+    const deleteFAQ = async (id) => {
+      await fetch(`/api/faqs/${id}`, { method: 'DELETE' });
+      fetchFAQs();
+    };
+
+    // Edit FAQ
+    const editFAQ = (id, question, answer) => {
+      document.getElementById('question').value = question;
+      document.getElementById('answer').value = answer;
+      
+      faqForm.onsubmit = async (e) => {
+        e.preventDefault();
+        await fetch(`/api/faqs/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question, answer })
+        });
+        fetchFAQs();
+        faqForm.reset();
+        faqForm.onsubmit = addFAQHandler;
+      };
+    };
+
+    // Add FAQ handler for form submission
+    const addFAQHandler = async (e) => {
+      e.preventDefault();
+      const question = document.getElementById('question').value;
+      const answer = document.getElementById('answer').value;
+      
+      await fetch('/api/faqs', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, answer })
+      });
+      
+      fetchFAQs();
+      faqForm.reset();
+    };
+
+    faqForm.onsubmit = addFAQHandler;
+
+    // Initial load
+    fetchFAQs();
+  </script>
+</body>
+</html>

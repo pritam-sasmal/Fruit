@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Translator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .translator-box {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+      display: inline-block;
+      text-align: left;
+    }
+
+    .translator-box select, .translator-box input, .translator-box button {
+      display: block;
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .translator-box button {
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    .translator-box button:hover {
+      background-color: #0056b3;
+    }
+
+    #translation-output {
+      font-size: 18px;
+      color: #333;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Simple English-Bangla Translator</h1>
+
+  <div class="translator-box">
+    <!-- Select languages -->
+    <label for="from-lang">From</label>
+    <select id="from-lang">
+      <option value="en">English</option>
+      <option value="bn">Bangla</option>
+    </select>
+
+    <label for="to-lang">To</label>
+    <select id="to-lang">
+      <option value="bn">Bangla</option>
+      <option value="en">English</option>
+    </select>
+
+    <!-- Input for text to translate -->
+    <label for="input-box">Enter text</label>
+    <input type="text" id="input-box" placeholder="Enter text to translate">
+
+    <!-- Button to trigger translation -->
+    <button onclick="translateText()">Translate</button>
+
+    <!-- Output translation -->
+    <div id="translation-output"></div>
+  </div>
+
+  <script>
+    // Function to handle text translation using Google Cloud Translation API
+    function translateText() {
+      const inputText = document.getElementById('input-box').value;
+      const fromLang = document.getElementById('from-lang').value;
+      const toLang = document.getElementById('to-lang').value;
+
+      if (inputText.trim() === '') {
+        alert('Please enter text to translate.');
+        return;
+      }
+
+      // Replace 'YOUR_API_KEY' with your actual Google Cloud API key
+      const apiKey = 'YOUR_API_KEY'; 
+
+      // Construct the request URL for Google Translate API
+      const url = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
+
+      // Create the request payload for translation API
+      const requestBody = {
+        q: inputText,
+        source: fromLang,
+        target: toLang,
+        format: 'text'
+      };
+
+      // Make a POST request to Google Translate API
+      fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        const translatedText = data.data.translations[0].translatedText;
+        document.getElementById('translation-output').innerText = translatedText;
+      })
+      .catch(error => {
+        console.error('Error occurred while translating:', error);
+        alert('Error occurred while translating. Please try again.');
+      });
+    }
+  </script>
+
+</body>
+</html>

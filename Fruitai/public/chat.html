@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chatbot - Fruits</title>
+  <style>
+    .fruit-card {
+      width: 200px;
+      padding: 15px;
+      margin: 15px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .fruit-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .fruit-details {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chatbot - List of Fruits</h1>
+  <div class="fruit-list">
+    <div class="fruit-card" onclick="showDetails('Apple')">Apple</div>
+    <div class="fruit-card" onclick="showDetails('Banana')">Banana</div>
+    <div class="fruit-card" onclick="showDetails('Mango')">Mango</div>
+  </div>
+
+  <div id="fruit-details" class="fruit-details">
+    <h2 id="fruit-name"></h2>
+    <p id="fruit-description"></p>
+  </div>
+
+  <script>
+    function showDetails(fruit) {
+      const fruitDetails = document.getElementById('fruit-details');
+      const fruitName = document.getElementById('fruit-name');
+      const fruitDescription = document.getElementById('fruit-description');
+
+      fruitDetails.style.display = 'block';
+      fruitName.innerText = fruit;
+      fruitDescription.innerText = `${fruit} is delicious and healthy.`;
+    }
+  </script>
+</body>
+</html>
